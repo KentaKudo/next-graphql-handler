@@ -1,11 +1,26 @@
+import { graphql } from "@/graphql";
 import Image from "next/image";
+import { cacheExchange, createClient, fetchExchange } from "@urql/core";
+import { registerUrql } from "@urql/next/rsc";
+
+const makeClient = () => {
+  return createClient({
+    url: "http://localhost:3000/api/graphql",
+    exchanges: [cacheExchange, fetchExchange],
+  });
+};
+
+const { getClient } = registerUrql(makeClient);
+
+const helloQuery = graphql(`
+  query Hello {
+    hello
+  }
+`);
 
 export default async function Home() {
-  const response = await fetch("http://localhost:3000/api/graphql", {
-    method: "GET",
-  });
-  const data = await response.json();
-  console.log("data", data);
+  const result = await getClient().query(helloQuery, {});
+  console.log("result.data", result.data);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
