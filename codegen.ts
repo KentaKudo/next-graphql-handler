@@ -6,6 +6,7 @@ const config: CodegenConfig = {
   ignoreNoDocuments: true,
   generates: {
     "./src/graphql/": { preset: "client" },
+    "./schema.graphql": { plugins: ["schema-ast"] },
   },
 };
 
