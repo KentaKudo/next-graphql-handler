@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"next dev\" \"graphql-codegen --watch\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -11,6 +11,7 @@
     "codegen:watch": "graphql-codegen --watch"
   },
   "dependencies": {
+    "@pothos/core": "^4.10.0",
     "@urql/core": "^6.0.1",
     "@urql/next": "^2.0.0",
     "graphql": "^16.12.0",
@@ -26,6 +27,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",

@@ -18,8 +18,12 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  foo?: Maybe<Scalars['String']['output']>;
   hello?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type QueryHelloArgs = {
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
@@ -28,4 +32,4 @@ export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 export type HelloQuery = { __typename?: 'Query', hello?: string | null };
 
 
-export const HelloDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Hello"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hello"}}]}}]} as unknown as DocumentNode<HelloQuery, HelloQueryVariables>;
+export const HelloDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Hello"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hello"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"John","block":false}}]}]}}]} as unknown as DocumentNode<HelloQuery, HelloQueryVariables>;

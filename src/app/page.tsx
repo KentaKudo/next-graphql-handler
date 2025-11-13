@@ -13,7 +13,7 @@ const { getClient } = registerUrql(makeClient);
 
 const helloQuery = graphql(`
   query Hello {
-    hello
+    hello(name: "John")
   }
 `);
 
