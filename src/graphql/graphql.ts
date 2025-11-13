@@ -26,10 +26,16 @@ export type QueryHelloArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type HelloFromClientComponentQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type HelloFromClientComponentQuery = { __typename?: 'Query', hello?: string | null };
+
 export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type HelloQuery = { __typename?: 'Query', hello?: string | null };
 
 
-export const HelloDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Hello"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hello"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"John","block":false}}]}]}}]} as unknown as DocumentNode<HelloQuery, HelloQueryVariables>;
+export const HelloFromClientComponentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HelloFromClientComponent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hello"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"from client component","block":false}}]}]}}]} as unknown as DocumentNode<HelloFromClientComponentQuery, HelloFromClientComponentQueryVariables>;
+export const HelloDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Hello"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hello"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"from server component","block":false}}]}]}}]} as unknown as DocumentNode<HelloQuery, HelloQueryVariables>;

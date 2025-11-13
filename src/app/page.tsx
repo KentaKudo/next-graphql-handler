@@ -1,19 +1,11 @@
 import { graphql } from "@/graphql";
-import { cacheExchange, createClient, fetchExchange } from "@urql/core";
-import { registerUrql } from "@urql/next/rsc";
-
-const makeClient = () => {
-  return createClient({
-    url: "http://localhost:3000/api/graphql",
-    exchanges: [cacheExchange, fetchExchange],
-  });
-};
-
-const { getClient } = registerUrql(makeClient);
+import { ClientComponent } from "./client-component";
+import { getClient } from "@/lib/urql";
+import { Suspense } from "react";
 
 const helloQuery = graphql(`
   query Hello {
-    hello(name: "John")
+    hello(name: "from server component")
   }
 `);
 
@@ -23,5 +15,12 @@ export default async function Home() {
     return <div>Error: {result.error.message}</div>;
   }
 
-  return <div>Hello: {result.data?.hello}</div>;
+  return (
+    <div>
+      <div>Hello: {result.data?.hello}</div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ClientComponent />
+      </Suspense>
+    </div>
+  );
 }

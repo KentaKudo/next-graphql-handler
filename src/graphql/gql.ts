@@ -14,10 +14,12 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query Hello {\n    hello(name: \"John\")\n  }\n": typeof types.HelloDocument,
+    "\n  query HelloFromClientComponent {\n    hello(name: \"from client component\")\n  }\n": typeof types.HelloFromClientComponentDocument,
+    "\n  query Hello {\n    hello(name: \"from server component\")\n  }\n": typeof types.HelloDocument,
 };
 const documents: Documents = {
-    "\n  query Hello {\n    hello(name: \"John\")\n  }\n": types.HelloDocument,
+    "\n  query HelloFromClientComponent {\n    hello(name: \"from client component\")\n  }\n": types.HelloFromClientComponentDocument,
+    "\n  query Hello {\n    hello(name: \"from server component\")\n  }\n": types.HelloDocument,
 };
 
 /**
@@ -37,7 +39,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Hello {\n    hello(name: \"John\")\n  }\n"): (typeof documents)["\n  query Hello {\n    hello(name: \"John\")\n  }\n"];
+export function graphql(source: "\n  query HelloFromClientComponent {\n    hello(name: \"from client component\")\n  }\n"): (typeof documents)["\n  query HelloFromClientComponent {\n    hello(name: \"from client component\")\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Hello {\n    hello(name: \"from server component\")\n  }\n"): (typeof documents)["\n  query Hello {\n    hello(name: \"from server component\")\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
