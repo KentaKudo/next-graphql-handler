@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧩 Next GraphQL Handler
+
+A minimal Next.js 16 project that keeps the entire GraphQL stack inside a Route Handler.  
+Hono provides routing, GraphQL Yoga handles execution, and Pothos builds a fully type-safe schema.  
+URQL powers both RSC data fetching and client components so the frontend and backend live in one repo.
+
+## Highlights
+
+- Next.js Route Handler + Hono = no separate API server or Lambdas to manage
+- GraphQL Yoga edge-ready handler with shared `GET`/`POST` exports for `/api/graphql`
+- Pothos GraphQL schema defined inline for fast iteration
+- URQL set up for both server components (`registerUrql`) and client components
+- GraphQL Code Generator preset that keeps `src/graphql/*` in sync with live schema
+
+## Project Layout
+
+```
+schema.graphql          # Generated SDL snapshot
+codegen.ts              # GraphQL Code Generator config
+src/
+├─ app/
+│  ├─ api/graphql/route.ts   # Hono + Yoga handler
+│  ├─ client-component.tsx   # Example client component using @urql/next
+│  └─ page.tsx               # RSC querying GraphQL via getClient()
+├─ graphql/                  # Generated documents & helpers (do not edit manually)
+├─ lib/urql.ts               # registerUrql() server-side client
+└─ providers/urql.tsx        # Suspense-ready UrqlProvider for client tree
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# install
+pnpm install        # or npm install / yarn install
+
+# run the dev server
+pnpm dev            # exposes http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The GraphQL endpoint is available at `http://localhost:3000/api/graphql`. You can send standard POST requests or open Yoga's GraphiQL playground in the browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## GraphQL Handler
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`src/app/api/graphql/route.ts`
 
-## Learn More
+```ts
+import { createYoga } from "graphql-yoga";
+import { Hono } from "hono";
+import SchemaBuilder from "@pothos/core";
 
-To learn more about Next.js, take a look at the following resources:
+const builder = new SchemaBuilder({});
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+builder.queryType({
+  fields: (t) => ({
+    hello: t.string({
+      args: { name: t.arg.string() },
+      resolve: (parent, { name }) => `hello, ${name || "World"}`,
+    }),
+  }),
+});
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+const yoga = createYoga({
+  graphqlEndpoint: "/api/graphql",
+  fetchAPI: { fetch, Request, ReadableStream, Response },
+  schema: builder.toSchema(),
+});
 
-## Deploy on Vercel
+const app = new Hono()
+  .basePath("/api")
+  .mount("/graphql", yoga, { replaceRequest: (req) => req });
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+export const GET = app.fetch;
+export const POST = app.fetch;
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Querying from React
+
+- `src/app/page.tsx` shows an async Server Component that runs a URQL query via `registerUrql()` and streams a fallback while waiting for the client component.
+- `src/app/client-component.tsx` is a Client Component that uses `useQuery` from `@urql/next`.
+
+```tsx
+const helloQuery = graphql(`
+  query HelloFromClientComponent {
+    hello(name: "from client component")
+  }
+`);
+
+export const ClientComponent = () => {
+  const [result] = useQuery({ query: helloQuery });
+  return <div>ClientComponent: {result.data?.hello}</div>;
+};
+```
+
+## GraphQL Code Generation
+
+This project ships with GraphQL Code Generator pre-configured:
+
+```bash
+pnpm codegen         # one-off run (server must be running so Yoga can serve the schema)
+pnpm codegen:watch   # keep documents and types in sync during development
+```
+
+Generated artifacts live in `src/graphql/*` and power the `graphql` tagged template you see in React components.
+
+## Customizing the Schema
+
+Add fields, mutations, or subscriptions directly in the Route Handler with Pothos:
+
+```ts
+builder.mutationType({
+  fields: (t) => ({
+    updatePostStatus: t.boolean({
+      args: {
+        id: t.arg.int({ required: true }),
+        status: t.arg.string({ required: true }),
+      },
+      resolve: async (_, { id, status }) => {
+        // implement your update logic here
+        return true;
+      },
+    }),
+  }),
+});
+```
+
+After editing, restart the dev server (if needed) and re-run `pnpm codegen` to refresh typed documents.
+
+## Deployment
+
+- Works on both Node and Edge runtimes thanks to Yoga's Fetch API and Hono's adapters.
+- Deploy straight to Vercel: the Route Handler exports (`GET`/`POST`) automatically become the `/api/graphql` endpoint.
+
+## License
+
+MIT
