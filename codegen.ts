@@ -1,7 +1,9 @@
+import { schema } from "./src/app/api/graphql/schema";
 import type { CodegenConfig } from "@graphql-codegen/cli";
+import { printSchema } from "graphql";
 
 const config: CodegenConfig = {
-  schema: "http://localhost:3000/api/graphql",
+  schema: printSchema(schema),
   documents: ["./**/*.{ts,tsx}"],
   ignoreNoDocuments: true,
   generates: {
