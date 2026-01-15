@@ -10,7 +10,7 @@ const helloQuery = graphql(`
 `);
 
 export default async function Home() {
-  const result = await getClient().query(helloQuery, {});
+  const result = await getClient().query(helloQuery, {}).toPromise();
   if (result.error) {
     return <div>Error: {result.error.message}</div>;
   }
