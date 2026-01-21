@@ -3,6 +3,9 @@ import { ClientComponent } from "./client-component";
 import { getClient } from "@/lib/urql";
 import { Suspense } from "react";
 
+// You may need this depending on your use case
+// export const dynamic = "force-dynamic";
+
 const helloQuery = graphql(`
   query Hello {
     hello(name: "from server component")
